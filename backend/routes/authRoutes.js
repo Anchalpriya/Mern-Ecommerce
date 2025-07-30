@@ -13,5 +13,10 @@ router
     .get("/check-auth",verifyToken,authController.checkAuth)
     .get('/logout',authController.logout)
 
+router.get("/test", (req, res) => {
+  res.send("Auth route is working ✅");
+});
+
+
 
 module.exports=router

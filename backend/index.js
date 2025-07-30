@@ -1,9 +1,23 @@
 require("dotenv").config()
+
+const fs = require("fs");
+console.log("Attempting to load .env file...");
+console.log(fs.existsSync(".env") ? ".env file found ✅" : ".env file NOT found ❌");
+console.log("SECRET_KEY is:", process.env.SECRET_KEY);
+
+
+
+
+
+
+
+
+
 const express=require('express')
 const cors=require('cors')
 const morgan=require("morgan")
 const cookieParser=require("cookie-parser")
-const authRoutes=require("./routes/Auth")
+const authRoutes = require("./routes/authRoutes");
 const productRoutes=require("./routes/Product")
 const orderRoutes=require("./routes/Order")
 const cartRoutes=require("./routes/Cart")
@@ -50,3 +64,5 @@ server.get("/",(req,res)=>{
 server.listen(8000,()=>{
     console.log('server [STARTED] ~ http://localhost:8000');
 })
+
+console.log("SECRET_KEY:", process.env.SECRET_KEY);

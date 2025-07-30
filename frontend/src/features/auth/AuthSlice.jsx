@@ -29,10 +29,24 @@ export const signupAsync=createAsyncThunk('auth/signupAsync',async(cred)=>{
     return res
 })
 
-export const loginAsync=createAsyncThunk('auth/loginAsync',async(cred)=>{
-    const res=await login(cred)
-    return res
-})
+export const loginAsync = createAsyncThunk(
+  'auth/loginAsync',
+  async (cred, { rejectWithValue }) => {
+    try {
+      const res = await login(cred);
+
+      if (!res || !res.data) {
+        return rejectWithValue({ message: "Invalid response from server" });
+      }
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || { message: "Login failed, please try again." }
+      );
+    }
+  }
+);
 
 export const verifyOtpAsync=createAsyncThunk('auth/verifyOtpAsync',async(cred)=>{
     const res=await verifyOtp(cred)
@@ -134,9 +148,10 @@ const authSlice=createSlice({
                 state.loggedInUser=action.payload
             })
             .addCase(signupAsync.rejected,(state,action)=>{
-                state.signupStatus='rejected'
-                state.signupError=action.error
-            })
+    state.signupStatus='rejected'
+    state.signupError=action.payload || { message: 'Signup failed' }
+})
+
 
             .addCase(loginAsync.pending,(state)=>{
                 state.loginStatus='pending'
@@ -145,10 +160,10 @@ const authSlice=createSlice({
                 state.loginStatus='fullfilled'
                 state.loggedInUser=action.payload
             })
-            .addCase(loginAsync.rejected,(state,action)=>{
-                state.loginStatus='rejected'
-                state.loginError=action.error
-            })
+            .addCase(loginAsync.rejected, (state, action) => {
+  state.loginStatus = 'rejected';
+  state.loginError = action.payload || { message: 'Unexpected login error' };
+})
 
             .addCase(verifyOtpAsync.pending,(state)=>{
                 state.otpVerificationStatus='pending'
